@@ -5,10 +5,15 @@ class Node:
         self.myID = ID
         self.ns = networksimulator
         num = self.ns.NUM_NODES        
-        self.distanceTable = [[0 for i in range(num)] for j in range(num)]
+        self.distanceTable = [[999 for i in range(num)] for j in range(num)]
         self.routes = [0 for i in range(num)]
 
         # you implement the rest of constructor
+        for i in range(num):
+            self.distanceTable[ID][i] = costs[i];
+            
+        for i in range(num):
+            self.distanceTable[i][i] = 0;
 
     def recvUpdate(self, pkt):
         
