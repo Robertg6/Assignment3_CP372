@@ -28,7 +28,7 @@ class Node:
         
         # you implement the rest of it  
 
-        for i in range(self.num):
+        for i in range(self.ns.NUM_NODES):
             if (pkt.mincosts[i] < self.distanceTable[pkt.sourceid][i]):
                 self.distanceTable[pkt.sourceid][i] = pkt.mincosts[i]
                 
@@ -39,8 +39,8 @@ class Node:
         changed = FALSE
 
 
-        for r in range(self.num):
-            for c in range(self.num):
+        for r in range(self.ns.NUM_NODES):
+            for c in range(self.ns.NUM_NODES):
 
                 x = self.distanceTable[r][c]    #initial value in table
 
@@ -50,8 +50,8 @@ class Node:
                     changed = TRUE
                     
                 
-        for r in range(self.num):
-            for c in range(self.num):
+        for r in range(self.ns.NUM_NODES):
+            for c in range(self.ns.NUM_NODES):
 
 
                 if (self.distanceTable[r][c] < self.distanceTable[c][r]):    #because bi-directional consider diagonal reflection
@@ -83,28 +83,29 @@ class Node:
         
     def toNeighbors(self):
 
-        newpkt = RTPacket()
+        
         
         #source ID = node you send from = this node ID
-        newpkt.sourceid = self.myID;
+        #newpkt.sourceid = self.myID;
 
         #initialize data to row of this node ID
-        for i in range(self.num):
-            newpkt.mincosts[i] = self.distanceTable[self.myID][i]
+        #for i in range(self.num):
+            #newpkt.mincosts[i] = self.distanceTable[self.myID][i]
             
 
 
         #send state to reachable neighbors
-        for i in range(self.num):
+        for i in range(self.ns.NUM_NODES):
             if (i != self.myID and self.routes[i] < 999):  #don't send to self or unreachable nodes
-                newpkt.destid = i
+                #newpkt.destid = i
+                newpkt = RTPacket(self.myID, i, self.distanceTable[self.myID])
                 self.ns.toLayer2(self, newpkt)
                 
                 
     def bellmanford(self, source, dest):
         costs = []
 
-        for i in range(self.num):
+        for i in range(self.ns.NUM_NODES):
             costs[i] = self.distanceTable[source][i] + self.distanceTable[i][dest]
             
         calcMin = min(costs)
