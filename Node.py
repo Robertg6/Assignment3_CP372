@@ -44,7 +44,7 @@ class Node:
 
                 x = self.distanceTable[r][c]    #initial value in table
 
-                self.bellmanford(self, r, c)   #try to update it with the bellman ford algorithm
+                self.bellmanford(r, c)   #try to update it with the bellman ford algorithm
 
                 if (x != self.dataTable[r][c]):  #if this has changed, and we are in row of current node, update changed boolean
                     changed = TRUE
@@ -99,7 +99,7 @@ class Node:
             if (i != self.myID and self.routes[i] < 999):  #don't send to self or unreachable nodes
                 #newpkt.destid = i
                 newpkt = RTPacket(self.myID, i, self.distanceTable[self.myID])
-                self.ns.toLayer2(self, newpkt)
+                self.ns.tolayer2(newpkt)
                 
                 
     def bellmanford(self, source, dest):
