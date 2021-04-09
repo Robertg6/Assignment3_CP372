@@ -8,7 +8,7 @@ class Node:
         self.ns = networksimulator
         num = self.ns.NUM_NODES        
         self.distanceTable = [[999 for i in range(num)] for j in range(num)]
-        self.routes = [999 for i in range(num)]
+        self.routes = [0 for i in range(num)]
 
         # you implement the rest of constructor
         for i in range(num):
@@ -16,6 +16,9 @@ class Node:
             
         for i in range(num):
             self.distanceTable[i][i] = 0
+            
+        #send initial configuration of this node to others
+        self.toNeighbors()
             
         
 
@@ -72,7 +75,7 @@ class Node:
 
             #only need to send to neighbors if we have updated shortest path
         if (changed):
-            self.toNeighbors(self)
+            self.toNeighbors()
             
               
             return;
