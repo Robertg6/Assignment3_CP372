@@ -10,6 +10,7 @@ class Node:
         num = self.ns.NUM_NODES        
         self.distanceTable = [[999 for i in range(num)] for j in range(num)]
         self.routes = [0 for i in range(num)]
+        self.routes[self.myID] = self.myID
 
         # you implement the rest of constructor
         for i in range(num):
