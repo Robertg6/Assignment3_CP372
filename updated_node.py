@@ -38,6 +38,7 @@ class Node:
             if (pkt.mincosts[i] < self.distanceTable[pkt.sourceid][i]):
                 self.distanceTable[pkt.sourceid][i] = pkt.mincosts[i]
                 
+                
         #update all nodes using bellman ford algorithm
         
 
@@ -105,7 +106,7 @@ class Node:
             if (i != self.myID and self.routes[i] < 999):  #don't send to self or unreachable nodes
                 #newpkt.destid = i
                 newpkt = RTPacket(self.myID, i, self.distanceTable[self.myID])
-                self.ns.toLayer2(newpkt)
+                self.ns.tolayer2(newpkt)
                 
                 
     def bellmanford(self, source, dest):
