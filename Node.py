@@ -1,6 +1,6 @@
 from common import *
 from pickle import FALSE, TRUE
-from startA3.common import RTPacket
+from common import RTPacket
 
 class Node:
     def __init__(self, ID, networksimulator, costs):
@@ -9,13 +9,19 @@ class Node:
         num = self.ns.NUM_NODES        
         self.distanceTable = [[999 for i in range(num)] for j in range(num)]
         self.routes = [0 for i in range(num)]
+        self.routes[self.myID] = self.myID
 
         # you implement the rest of constructor
         for i in range(num):
             self.distanceTable[ID][i] = costs[i]
             
         for i in range(num):
-            self.distanceTable[i][i] = 0
+            for ii in range(num):
+                if i != ii and self.distanceTable[i][ii] == 0:
+                    self.distanceTable[i][ii] = 999
+                elif i == ii:
+                    self.distanceTable[i][ii] = 0
+            
             
         #send initial configuration of this node to others
         self.toNeighbors()
@@ -32,6 +38,7 @@ class Node:
             if (pkt.mincosts[i] < self.distanceTable[pkt.sourceid][i]):
                 self.distanceTable[pkt.sourceid][i] = pkt.mincosts[i]
                 
+                
         #update all nodes using bellman ford algorithm
         
 
@@ -46,10 +53,10 @@ class Node:
 
                 self.bellmanford(r, c)   #try to update it with the bellman ford algorithm
 
-                if (x != self.dataTable[r][c]):  #if this has changed, and we are in row of current node, update changed boolean
+                if (x != self.distanceTable[r][c]):  #if this has changed, and we are in row of current node, update changed boolean
                     changed = TRUE
                     
-                
+        
         for r in range(self.ns.NUM_NODES):
             for c in range(self.ns.NUM_NODES):
 
@@ -58,7 +65,7 @@ class Node:
                     self.distanceTable[c][r] = self.distanceTable[r][c]
                     changed = TRUE
                     
-                if (self.distanceTable[c][r] < self.distanceTable[r][c]):   #now reverse
+                elif (self.distanceTable[c][r] < self.distanceTable[r][c]):   #now reverse
                     self.distanceTable[r][c] = self.distanceTable[c][r]
                     changed = TRUE
                     
@@ -67,18 +74,33 @@ class Node:
                         changed = TRUE
                         
                     self.distanceTable[r][c] = 0
-                    
-
-                    
             
 
 
             #only need to send to neighbors if we have updated shortest path
-        if (changed):
-            self.toNeighbors()
+        if (changed == TRUE):
             
-              
-            return;
+            
+
+            for c in range(self.ns.NUM_NODES):
+                dists = [0] * self.ns.NUM_NODES
+                
+                for r in range(self.ns.NUM_NODES):
+                    if(c == r):
+                        dists[r] = 999
+                        
+                    else:
+                        dists[r] = self.distanceTable[r][c]
+                        
+                    #if(self.distanceTable[r][c] < self.routes[c]): ignore this line
+                        #self.routes[c] = self.distanceTable[r][c] ignore this line
+                self.routes[c] = dists.index(min(dists)) 
+                        
+                        
+            self.toNeighbors()
+        
+    
+        return;
         
         
     def toNeighbors(self):
@@ -106,7 +128,7 @@ class Node:
         costs = []
 
         for i in range(self.ns.NUM_NODES):
-            costs[i] = self.distanceTable[source][i] + self.distanceTable[i][dest]
+            costs.append(self.distanceTable[source][i] + self.distanceTable[i][dest])
             
         calcMin = min(costs)
 
@@ -134,4 +156,3 @@ class Node:
                 print("{:3d}   ".format(self.distanceTable[i][j]), end="" )
             print()            
         print()
-        
