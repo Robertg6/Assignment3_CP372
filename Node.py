@@ -23,8 +23,7 @@ class Node:
                     self.distanceTable[i][ii] = 0
             
             
-        #send initial configuration of this node to others
-        self.toNeighbors()
+        self.toAdjacentNodes()
             
         
 
@@ -37,23 +36,18 @@ class Node:
         for i in range(self.ns.NUM_NODES):
             if (pkt.mincosts[i] < self.distanceTable[pkt.sourceid][i]):
                 self.distanceTable[pkt.sourceid][i] = pkt.mincosts[i]
-                
-                
-        #update all nodes using bellman ford algorithm
-        
 
-        #int x; // temp variable used to detect changes in nodeID row
         changed = FALSE
 
 
         for r in range(self.ns.NUM_NODES):
             for c in range(self.ns.NUM_NODES):
 
-                x = self.distanceTable[r][c]    #initial value in table
+                x = self.distanceTable[r][c]  
 
-                self.bellmanford(r, c)   #try to update it with the bellman ford algorithm
+                self.bellmanford(r, c) 
 
-                if (x != self.distanceTable[r][c]):  #if this has changed, and we are in row of current node, update changed boolean
+                if (x != self.distanceTable[r][c]): 
                     changed = TRUE
                     
         
@@ -61,65 +55,45 @@ class Node:
             for c in range(self.ns.NUM_NODES):
 
 
-                if (self.distanceTable[r][c] < self.distanceTable[c][r]):    #because bi-directional consider diagonal reflection
+                if (self.distanceTable[r][c] < self.distanceTable[c][r]): 
                     self.distanceTable[c][r] = self.distanceTable[r][c]
                     changed = TRUE
                     
-                elif (self.distanceTable[c][r] < self.distanceTable[r][c]):   #now reverse
+                elif (self.distanceTable[c][r] < self.distanceTable[r][c]): 
                     self.distanceTable[r][c] = self.distanceTable[c][r]
                     changed = TRUE
                     
-                if (r == c):                  #if we send to self, cost is 0
+                if (r == c):           
                     if (self.distanceTable[r][c] != 0):
                         changed = TRUE
                         
                     self.distanceTable[r][c] = 0
             
-
-
-            #only need to send to neighbors if we have updated shortest path
         if (changed == TRUE):
             
-            
-
             for c in range(self.ns.NUM_NODES):
                 dists = [0] * self.ns.NUM_NODES
                 
                 for r in range(self.ns.NUM_NODES):
                     if(c == r):
-                        dists[r] = 999
-                        
+                        dists[r] = 999 
                     else:
-                        dists[r] = self.distanceTable[r][c]
-                        
-                    #if(self.distanceTable[r][c] < self.routes[c]): ignore this line
-                        #self.routes[c] = self.distanceTable[r][c] ignore this line
+                        dists[r] = self.distanceTable[r][c] 
+
                 self.routes[c] = dists.index(min(dists)) 
                         
-                        
-            self.toNeighbors()
+            self.routes[self.myID] = self.myID
+            
+            self.toAdjacentNodes()
         
     
         return;
         
         
-    def toNeighbors(self):
+    def toAdjacentNodes(self):
 
-        
-        
-        #source ID = node you send from = this node ID
-        #newpkt.sourceid = self.myID;
-
-        #initialize data to row of this node ID
-        #for i in range(self.num):
-            #newpkt.mincosts[i] = self.distanceTable[self.myID][i]
-            
-
-
-        #send state to reachable neighbors
         for i in range(self.ns.NUM_NODES):
-            if (i != self.myID and self.routes[i] < 999):  #don't send to self or unreachable nodes
-                #newpkt.destid = i
+            if (i != self.myID and self.routes[i] < 999):
                 newpkt = RTPacket(self.myID, i, self.distanceTable[self.myID])
                 self.ns.tolayer2(newpkt)
                 
@@ -135,9 +109,6 @@ class Node:
         if (calcMin < self.distanceTable[source][dest]):
             self.distanceTable[source][dest] = calcMin
             
-
-
-        
 
     
     def printdt(self):
